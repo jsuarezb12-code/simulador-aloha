@@ -1,0 +1,151 @@
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulación ALOHA Ranurado</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        text-align: center;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #333;
+    }
+
+    table {
+        margin: auto;
+        border-collapse: collapse;
+        width: 90%;
+        background: white;
+    }
+
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+    }
+
+    th {
+        background: #007bff;
+        color: white;
+    }
+
+    .colision {
+        color: red;
+        font-weight: bold;
+    }
+
+    .exito {
+        color: green;
+        font-weight: bold;
+    }
+
+    button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    input {
+        padding: 8px;
+        width: 100px;
+    }
+</style>
+</head>
+<body>
+
+<h1>Simulación ALOHA Ranurado (3 Nodos)</h1>
+
+<label>Cantidad de slots:</label>
+<input type="number" id="slots" value="20" min="1">
+<button onclick="simular()">Iniciar Simulación</button>
+
+<br><br>
+
+<table id="tabla">
+    <thead>
+        <tr>
+            <th>Slot</th>
+            <th>Nodo A</th>
+            <th>Nodo B</th>
+            <th>Nodo C</th>
+            <th>Resultado</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<h2 id="resumen"></h2>
+
+<script>
+
+function randomChoice() {
+    return Math.random() < 0.5 ? 0 : 1;
+}
+
+function simular() {
+
+    const slotsTotales = parseInt(document.getElementById("slots").value);
+
+    const tbody = document.querySelector("#tabla tbody");
+    tbody.innerHTML = "";
+
+    let exitos = 0;
+    let colisiones = 0;
+
+    for(let slot = 1; slot <= slotsTotales; slot++) {
+
+        let nodoA = randomChoice();
+        let nodoB = randomChoice();
+        let nodoC = randomChoice();
+
+        // Evitar slots vacíos
+        if((nodoA + nodoB + nodoC) === 0){
+            const ganador = Math.floor(Math.random() * 3);
+
+            if(ganador === 0) nodoA = 1;
+            else if(ganador === 1) nodoB = 1;
+            else nodoC = 1;
+        }
+
+        const transmisiones = nodoA + nodoB + nodoC;
+
+        let resultado = "";
+
+        if(transmisiones > 1){
+            resultado = "COLISIÓN";
+            colisiones++;
+        } else {
+            resultado = "TRANSMISIÓN EXITOSA";
+            exitos++;
+        }
+
+        const fila = `
+            <tr>
+                <td>${slot}</td>
+                <td>${nodoA ? "TRANSMITE" : "ESPERA"}</td>
+                <td>${nodoB ? "TRANSMITE" : "ESPERA"}</td>
+                <td>${nodoC ? "TRANSMITE" : "ESPERA"}</td>
+                <td class="${resultado.includes('COLISIÓN') ? 'colision' : 'exito'}">
+                    ${resultado}
+                </td>
+            </tr>
+        `;
+
+        tbody.innerHTML += fila;
+    }
+
+    document.getElementById("resumen").innerHTML =
+        `Slots procesados: ${slotsTotales} |
+        Transmisiones exitosas: ${exitos} |
+        Colisiones: ${colisiones}`;
+}
+
+</script>
+
+</body>
+</html>
